@@ -6,11 +6,13 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { TrophyIcon, CalendarDaysIcon, MagnifyingGlassIcon, TvIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 const navItems = [
-    { icon: <TvIcon className="w-5 h-5" />, title: "En Emisión", route: "/" },
-    { icon: <CalendarDaysIcon className="w-5 h-5" />, title: "Temporadas", route: "/temporada" },
-    { icon: <MagnifyingGlassIcon className="w-5 h-5" />, title: "Buscar", route: "/search" },
-    { icon: <TrophyIcon className="w-5 h-5" />, title: "Top", route: "/top" },
+    { icon: <TvIcon className="w-5 h-5" />, title: "En Emisión", route: `${BASE_PATH}/` },
+    { icon: <CalendarDaysIcon className="w-5 h-5" />, title: "Temporadas", route: `${BASE_PATH}/temporada/` },
+    { icon: <MagnifyingGlassIcon className="w-5 h-5" />, title: "Buscar", route: `${BASE_PATH}/search/` },
+    { icon: <TrophyIcon className="w-5 h-5" />, title: "Top", route: `${BASE_PATH}/top/` },
 ];
 
 interface LayoutProps {
@@ -28,8 +30,8 @@ export function Layout({ children }: LayoutProps) {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center gap-3 group">
-                            <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-lg" />
+                        <Link href={`${BASE_PATH}/`} className="flex items-center gap-3 group">
+                            <Image src={`${BASE_PATH}/logo.png`} alt="Logo" width={40} height={40} className="rounded-lg" />
                             <span className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                                 AnimeWeb
                             </span>
