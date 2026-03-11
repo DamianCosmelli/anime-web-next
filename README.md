@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AnimeWeb 🎬
 
-## Getting Started
+Una aplicación web moderna para explorar anime, construida con Next.js y la API de Jikan (MyAnimeList).
 
-First, run the development server:
+## Características
+
+- **Anime en Emisión**: Ver los anime que se están emitiendo actualmente
+- **Explorar por Temporada**: Navega anime por temporada y año
+- **Búsqueda**: Encuentra anime por nombre
+- **Top Anime**: Descubre los anime mejor valorados
+- **Detalles de Anime**: Ver información completa incluyendo sinopsis y trailer
+- **Traducción de Sinopsis**: Traducción automática al español (mediante MyMemory API)
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Lenguaje**: TypeScript
+- **Estilos**: Tailwind CSS
+- **API**: Jikan API (MyAnimeList)
+- **Traducción**: MyMemory API
+- **Despliegue**: GitHub Pages
+
+## Instalación
 
 ```bash
+# Clonar el repositorio
+git clone <url-del-repositorio>
+cd anime-web-next
+
+# Instalar dependencias
+npm install
+
+# Ejecutar en desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Despliegue en GitHub Pages
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Hacer build y desplegar
+npm run deploy
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Este comando:
+1. Ejecuta `npm run build` (predeploy)
+2. Publica el directorio `out` en la rama `gh-pages`
 
-## Learn More
+La aplicación estará disponible en: `https://tu-usuario.github.io/anime-web-next/`
 
-To learn more about Next.js, take a look at the following resources:
+### Requisitos previos
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Crear un repositorio en GitHub con el nombre `anime-web-next`
+2. El repositorio debe tener GitHub Pages habilitado (Settings → Pages → Source: gh-pages)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Estructura del Proyecto
 
-## Deploy on Vercel
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── page.tsx           # Página principal (Anime en Emisión)
+│   ├── search/            # Página de búsqueda
+│   ├── temporada/         # Página de temporadas
+│   └── top/              # Página de top anime
+├── components/            # Componentes React
+│   ├── Anime/            # Componentes de anime
+│   ├── common/           # Componentes compartidos
+│   └── Layout/           # Layout principal
+├── services/             # Servicios API
+├── types/                # Tipos TypeScript
+└── utils/                # Utilidades
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Variables de Entorno
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+NEXT_PUBLIC_API_BASE_URL=https://api.jikan.moe/v4
+```
+
+## Licencia
+
+MIT © 2025 AnimeWeb - Datos proporcionados por [Jikan API](https://jikan.moe/)
