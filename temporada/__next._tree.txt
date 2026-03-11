@@ -1,2 +1,2 @@
-:HL["/anime-web-next/_next/static/chunks/331fa0cc241d899f.css","style"]
-0:{"buildId":"EZj-HtAE__k2Uj4-nAfme","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"temporada","paramType":null,"paramKey":"temporada","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
+:HL["/_next/static/chunks/331fa0cc241d899f.css","style"]
+0:{"buildId":"1Fg3DqPB6n_HZCCm7HL2x","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"temporada","paramType":null,"paramKey":"temporada","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
