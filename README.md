@@ -34,6 +34,18 @@ npm install
 npm run dev
 ```
 
+### Desarrollo Local
+
+Cuando ejecutas `npm run dev` localmente, la aplicación corre en `http://localhost:3000/` sin basePath. 
+
+**Nota importante sobre basePath:**
+- **En desarrollo local**: El archivo `next.config.ts` tiene `basePath: '/anime-web-next'` configurado permanentemente
+- Si necesitas probar sin basePath en local, puedes:
+  1. Cambiar temporalmente `basePath` en `next.config.ts` a una cadena vacía `''`
+  2. O crear una variable de entorno para desarrollo local
+
+Las rutas internas usan la variable `BASE_PATH` definida en `MainLayout.tsx` que referencia el basePath configurado.
+
 ## Despliegue en GitHub Pages
 
 ```bash
