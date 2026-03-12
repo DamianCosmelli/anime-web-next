@@ -2,6 +2,7 @@
 
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
     isOpen: boolean;
@@ -23,7 +24,7 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
 
     if (!isOpen) return null;
 
-    return (
+    const modalContent = (
         <div 
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={onClose}
@@ -31,7 +32,7 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
             
             <div 
-                className="relative z-10 w-full max-w-4xl h-[90vh] overflow-hidden"
+                className="relative w-full max-w-4xl h-[90vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
@@ -46,4 +47,6 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 };
