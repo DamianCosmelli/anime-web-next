@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { animeSearch, animeAll } from '@/services/animeService';
+import { animeAll, animeSearch } from '@/services/anilistService';
 import { Anime } from '@/types/anime';
 import { AnimeResponse } from '@/types/animeResponse';
 import { AnimeGrid } from '@/components/Anime/AnimeGrid';
@@ -10,69 +10,71 @@ import { LoadingPuff } from '@/components/common/LoadingPuff';
 import { PaginationComp } from '@/components/common/Pagination';
 import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
+const DEBOUNCE_MS = 500;
+
 export default function AnimeSearchPage() {
-    const [animeList, setAnimeList] = useState<Anime[] | null>(null);
+    const [animeList, setAnimeList] = useState<Anime[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [animePagination, setAnimePagination] = useState<{
-        last_visible_page: number;
+        last_visible_page: number | null;
         has_next_page: boolean;
     } | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [hasNextPage, setHasNextPage] = useState<boolean | undefined>(undefined);
 
-    const [animeListUpdated, setAnimeListUpdated] = useState<Anime[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [searching, setSearching] = useState(false);
-    const [notFound, setNotFound] = useState(false);
+    const [debouncedTerm, setDebouncedTerm] = useState("");
+    const searching = debouncedTerm.trim() !== "";
 
     useEffect(() => {
-        const getAnimeAll = async () => {
-            setLoading(true);
+        const timer = setTimeout(() => setDebouncedTerm(searchTerm), DEBOUNCE_MS);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedTerm]);
+
+    useEffect(() => {
+        let cancelled = false;
+        const fetchData = async () => {
             try {
-                const data: AnimeResponse = await animeAll(currentPage);
-                const uniqueAnime = Array.from(new Map(data.data.map((anime: Anime) => [anime.mal_id, anime])).values());
-                setAnimeList(uniqueAnime);
-                setAnimeListUpdated(uniqueAnime);
+                const data: AnimeResponse = searching
+                    ? await animeSearch(debouncedTerm, currentPage)
+                    : await animeAll(currentPage);
+                if (cancelled) return;
+                setAnimeList(data.data ?? []);
                 setAnimePagination(data.pagination);
                 setHasNextPage(data.pagination?.has_next_page);
+                setError(null);
             } catch (err) {
-                setError((err as Error).message);
+                if (!cancelled) setError((err as Error).message);
             } finally {
-                setLoading(false);
+                if (!cancelled) setLoading(false);
             }
         };
-        getAnimeAll();
-    }, [currentPage]);
+        fetchData();
+        return () => {
+            cancelled = true;
+        };
+    }, [debouncedTerm, currentPage, searching]);
 
-    const handleSearch = async () => {
-        if (!searchTerm.trim()) return;
-        
-        setLoading(true);
-        try {
-            const filteredAnime: AnimeResponse = await animeSearch(searchTerm);
-            const uniqueAnime = Array.from(new Map(filteredAnime.data.map((anime: Anime) => [anime.mal_id, anime])).values());
-            const filtered = uniqueAnime.filter(anime => anime.title.toLowerCase().includes(searchTerm.toLowerCase()));
-            setAnimeListUpdated(filtered);
-            setCurrentPage(1);
-            setHasNextPage(false);
-            setSearching(true);
-            setNotFound(filtered.length === 0);
-        } catch (err) {
-            setAnimeListUpdated([]);
-            setNotFound(true);
-            setSearching(true);
-        } finally {
-            setLoading(false);
-        }
+    const handleSearch = () => {
+        setDebouncedTerm(searchTerm);
+        setCurrentPage(1);
     };
 
     const handleReload = () => {
-        window.location.reload();
+        setSearchTerm("");
+        setDebouncedTerm("");
+        setCurrentPage(1);
     };
 
     if (loading) return <LoadingPuff />;
     if (error) return <ErrorMessage error={error} />;
+
+    const notFound = searching && animeList.length === 0;
 
     return (
         <div className="max-w-7xl mx-auto">
@@ -100,34 +102,19 @@ export default function AnimeSearchPage() {
                             className="w-full pl-12 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyDown={async (e) => {
+                            onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    await handleSearch();
+                                    handleSearch();
                                 }
                             }}
                         />
                     </div>
-                    <button
-                        onClick={handleSearch}
-                        className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2"
-                    >
-                        <MagnifyingGlassIcon className="w-5 h-5" />
-                        Buscar
-                    </button>
                 </div>
             </div>
 
             {/* Pagination or Back button */}
             <div className="px-4 sm:px-6 lg:px-8 pb-4">
-                {animePagination && !searching ? (
-                    <PaginationComp
-                        currentPage={currentPage}
-                        lastPage={animePagination.last_visible_page}
-                        setCurrentPage={setCurrentPage}
-                        hasNextPage={hasNextPage}
-                        setHasNextPage={setHasNextPage}
-                    />
-                ) : (
+                {searching ? (
                     <button
                         onClick={handleReload}
                         className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
@@ -135,17 +122,40 @@ export default function AnimeSearchPage() {
                         <ArrowPathIcon className="w-4 h-4" />
                         Volver al catálogo
                     </button>
+                ) : (
+                    animePagination && (
+                        <PaginationComp
+                            currentPage={currentPage}
+                            lastPage={animePagination.last_visible_page}
+                            setCurrentPage={setCurrentPage}
+                            hasNextPage={hasNextPage}
+                            setHasNextPage={setHasNextPage}
+                        />
+                    )
                 )}
             </div>
 
             {/* Results */}
-            {notFound && searching ? (
+            {notFound ? (
                 <div className="flex flex-col items-center justify-center py-20">
                     <div className="text-6xl mb-4">🔍</div>
-                    <p className="text-gray-500 text-lg">No se encontraron resultados para "{searchTerm}"</p>
+                    <p className="text-gray-500 text-lg">No se encontraron resultados para &quot;{debouncedTerm}&quot;</p>
                 </div>
             ) : (
-                <AnimeGrid animeList={animeListUpdated ?? []} />
+                <>
+                    <AnimeGrid animeList={animeList} />
+                    {searching && animePagination && animeList.length > 0 && (
+                        <div className="px-4 sm:px-6 lg:px-8 py-4">
+                            <PaginationComp
+                                currentPage={currentPage}
+                                lastPage={animePagination.last_visible_page}
+                                setCurrentPage={setCurrentPage}
+                                hasNextPage={hasNextPage}
+                                setHasNextPage={setHasNextPage}
+                            />
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );

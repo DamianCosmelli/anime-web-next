@@ -27,6 +27,10 @@ export interface Anime {
         name: string;
     };
     status: string;
+    airing?: boolean;
+    broadcast?: {
+        string?: string;
+    };
     aired: {
         string: string;
     };

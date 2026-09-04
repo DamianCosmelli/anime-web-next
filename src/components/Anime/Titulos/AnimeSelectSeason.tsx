@@ -9,16 +9,12 @@ import { useEffect } from "react";
 
 export const AnimeSelectSeason = ({
     seasons,
-    years,
     onSubmit,
-    defaultSeason,
-    defaultYear
+    defaultSeason
 }: {
     seasons: Record<string, string>;
-    years: Record<string, string>;
     onSubmit: (data: SelectSeasonFormData) => void;
     defaultSeason?: string;
-    defaultYear?: string;
 }) => {
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<SelectSeasonFormData>({
         resolver: zodResolver(selectSeasonSchema),
@@ -26,11 +22,12 @@ export const AnimeSelectSeason = ({
 
     useEffect(() => {
         setValue("season", defaultSeason || "winter");
-        setValue("seasonYear", defaultYear || new Date().getFullYear().toString());
-    }, [defaultSeason, defaultYear, setValue]);
+        setValue("seasonYear", new Date().getFullYear().toString());
+    }, [defaultSeason, setValue]);
 
     return (
         <form className="flex flex-col sm:flex-row gap-4 items-end" onSubmit={handleSubmit(onSubmit)}>
+            <input type="hidden" {...register("seasonYear")} />
             <div className="flex-1 w-full">
                 <label htmlFor="season" className="block text-sm font-medium text-gray-400 mb-2">Temporada</label>
                 <select
@@ -46,24 +43,6 @@ export const AnimeSelectSeason = ({
                     ))}
                 </select>
                 {errors.season && <p className="text-red-500 text-sm mt-1">{errors.season.message}</p>}
-            </div>
-
-            <div className="flex-1 w-full">
-                <label htmlFor="seasonYear" className="block text-sm font-medium text-gray-400 mb-2">Año</label>
-                <select 
-                    id="seasonYear" 
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                    {...register("seasonYear")}
-                >
-                    {Object.entries(years)
-                        .sort((a, b) => Number(b[0]) - Number(a[0]))
-                        .map(([key, value]) => (
-                            <option key={key} value={key} className="bg-gray-800">
-                                {value}
-                            </option>
-                        ))}
-                </select>
-                {errors.seasonYear && <p className="text-red-500 text-sm mt-1">{errors.seasonYear.message}</p>}
             </div>
 
             <button

@@ -3,7 +3,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 interface PaginationProps {
-    lastPage: number | undefined;
+    lastPage: number | null | undefined;
     currentPage: number;
     setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
     hasNextPage: boolean | undefined;
@@ -37,9 +37,15 @@ export const PaginationComp: React.FC<PaginationProps> = ({
             </button>
             
             <span className="px-4 py-2 bg-gray-800 rounded-lg text-gray-300 font-medium">
-                <span className="text-emerald-400">{currentPage}</span>
-                <span className="text-gray-500 mx-1">/</span>
-                <span className="text-gray-400">{lastPage}</span>
+                {lastPage != null ? (
+                    <>
+                        <span className="text-emerald-400">{currentPage}</span>
+                        <span className="text-gray-500 mx-1">/</span>
+                        <span className="text-gray-400">{lastPage}</span>
+                    </>
+                ) : (
+                    <span className="text-gray-300">Página <span className="text-emerald-400">{currentPage}</span></span>
+                )}
             </span>
             
             <button

@@ -1,7 +1,8 @@
 import { Anime } from './anime';
 
 export interface Pagination {
-    last_visible_page: number;
+    // null = total desconocido (la API topa/estima el total): no mostrar "/ N".
+    last_visible_page: number | null;
     has_next_page: boolean;
     current_page: number | null;
     items: {

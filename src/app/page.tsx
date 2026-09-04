@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { animeTv } from '@/services/animeService';
+import { animeTv } from '@/services/anilistService';
 import { Anime } from '@/types/anime';
 import { AnimeResponse } from '@/types/animeResponse';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
@@ -11,11 +11,11 @@ import { PaginationComp } from '@/components/common/Pagination';
 import { TvIcon } from '@heroicons/react/24/outline';
 
 export default function AnimeOnTv() {
-    const [animeList, setAnimeList] = useState<Anime[] | null>(null);
+    const [animeList, setAnimeList] = useState<Anime[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [animePagination, setAnimePagination] = useState<{
-        last_visible_page: number;
+        last_visible_page: number | null;
         has_next_page: boolean;
     } | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -24,10 +24,10 @@ export default function AnimeOnTv() {
     useEffect(() => {
         const getAnime = async () => {
             setLoading(true);
+            setError(null);
             try {
                 const data: AnimeResponse = await animeTv(currentPage);
-                const uniqueAnime = Array.from(new Map(data.data.map((anime: Anime) => [anime.mal_id, anime])).values());
-                setAnimeList(uniqueAnime);
+                setAnimeList(data.data ?? []);
                 setAnimePagination(data.pagination);
                 setHasNextPage(data.pagination?.has_next_page);
             } catch (err) {
@@ -70,8 +70,17 @@ export default function AnimeOnTv() {
                 </div>
             )}
 
-            {/* Grid */}
-            <AnimeGrid animeList={animeList ?? []} />
+            {/* Grid or empty notice */}
+            {animeList.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 px-4">
+                    <div className="text-6xl mb-4">📭</div>
+                    <p className="text-gray-400 text-lg text-center">
+                        No hay resultados en esta página.
+                    </p>
+                </div>
+            ) : (
+                <AnimeGrid animeList={animeList} />
+            )}
         </div>
     );
 }
