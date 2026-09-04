@@ -1,2 +1,2 @@
-:HL["/anime-web-next/_next/static/chunks/dcc8313413f2e7ca.css","style"]
-0:{"buildId":"Fp-dMcmtmRVYwXwJweTeW","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"top","paramType":null,"paramKey":"top","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
+:HL["/_next/static/chunks/a1afe93421e2ac2c.css","style"]
+0:{"buildId":"FIrueef7xi7Iq77Sq4277","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"top","paramType":null,"paramKey":"top","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"staleTime":300}
