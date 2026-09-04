@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { animeSeason } from '@/services/animeService';
+import { animeSeason } from '@/services/anilistService';
 import { Anime } from '@/types/anime';
 import { AnimeResponse } from '@/types/animeResponse';
 import { PaginationComp } from '@/components/common/Pagination';
@@ -12,16 +12,6 @@ import { LoadingPuff } from '@/components/common/LoadingPuff';
 import { getSeasonName, Seasons } from '@/utils/seasonConverts';
 import { SelectSeasonFormData } from '@/schema/SelectSeasonSchema';
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
-
-function getSeasonYear() {
-    const date = new Date();
-    const year = date.getFullYear();
-    const seasonYears = [year + 1, year, year - 1, year - 2];
-    return seasonYears.reduce((acc, curr) => {
-        acc[curr.toString()] = curr.toString();
-        return acc;
-    }, {} as Record<string, string>);
-}
 
 function actualYear(): string {
     const fechaActual = new Date();
@@ -45,11 +35,11 @@ export default function AnimeSeasonPage() {
     });
     const [titulo, setTitulo] = useState<string>("Anime de la Temporada " + getSeasonName(SeasonXDate()) + " del " + actualYear());
 
-    const [animeSeasonList, setAnimeSeasonList] = useState<Anime[] | null>(null);
+    const [animeSeasonList, setAnimeSeasonList] = useState<Anime[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [animePagination, setAnimePagination] = useState<{
-        last_visible_page: number;
+        last_visible_page: number | null;
         has_next_page: boolean;
     } | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -58,10 +48,10 @@ export default function AnimeSeasonPage() {
     useEffect(() => {
         const getAnimeSeason = async () => {
             setLoading(true);
+            setError(null);
             try {
                 const data: AnimeResponse = await animeSeason(seleccion.season, seleccion.seasonYear, currentPage);
-                const uniqueAnime = Array.from(new Map(data.data.map((anime: Anime) => [anime.mal_id, anime])).values());
-                setAnimeSeasonList(uniqueAnime);
+                setAnimeSeasonList(data.data ?? []);
                 setAnimePagination(data.pagination);
                 setHasNextPage(data.pagination?.has_next_page);
             } catch (err) {
@@ -78,7 +68,8 @@ export default function AnimeSeasonPage() {
     }, [seleccion]);
 
     const handleFormSubmit = (data: SelectSeasonFormData) => {
-        setSelection({ season: data.season, seasonYear: data.seasonYear });
+        setSelection({ season: data.season, seasonYear: actualYear() });
+        setCurrentPage(1);
     };
 
     if (loading) return <LoadingPuff />;
@@ -105,10 +96,8 @@ export default function AnimeSeasonPage() {
                     <h3 className="text-lg font-semibold text-white mb-4">Seleccionar Temporada</h3>
                     <AnimeSelectSeason
                         seasons={Seasons}
-                        years={getSeasonYear()}
                         onSubmit={handleFormSubmit}
                         defaultSeason={seleccion.season}
-                        defaultYear={seleccion.seasonYear}
                     />
                 </div>
             </div>
@@ -119,7 +108,7 @@ export default function AnimeSeasonPage() {
             </div>
 
             {/* Pagination */}
-            {animePagination && (
+            {animePagination && animeSeasonList.length > 0 && (
                 <div className="px-4 sm:px-6 lg:px-8 pb-4">
                     <PaginationComp
                         currentPage={currentPage}
@@ -131,8 +120,17 @@ export default function AnimeSeasonPage() {
                 </div>
             )}
 
-            {/* Grid */}
-            <AnimeGrid animeList={animeSeasonList ?? []} />
+            {/* Grid or honest empty notice */}
+            {animeSeasonList.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 px-4">
+                    <div className="text-6xl mb-4">📭</div>
+                    <p className="text-gray-400 text-lg text-center">
+                        La API no devolvió resultados para {titulo}. Prueba con otra temporada.
+                    </p>
+                </div>
+            ) : (
+                <AnimeGrid animeList={animeSeasonList} />
+            )}
         </div>
     );
 }
